@@ -107,17 +107,35 @@
             left: 0;
             right: 0;
             bottom: 0;
-            opacity: 0;
-            pointer-events: none;
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
         
         .card-back.show {
-            opacity: 1;
-            pointer-events: auto;
+            display: flex;
+        }
+        
+        /* Confetti styles */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: fall 3s ease-in forwards;
+            z-index: 1000;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
         }
         
         .card-emoji {
@@ -316,7 +334,7 @@
         <div class="flashcard" id="flashcard">
             <div class="card-front">
                 <div class="card-emoji">📌</div>
-                <div class="card-content" id="card-front-content">Posting a weekly automated announcement or announcements saying, "Keep up the good work!"</div>
+                <div class="card-content" id="card-front-content">Posting a weekly automated announcement or announcement saying, "Keep up the good work!"</div>
                 
                 <div class="quiz-options" id="quiz-options">
                     <div class="quiz-question">Does this count as RSI?</div>
@@ -369,7 +387,7 @@
         // Card data
         const cardData = [
             {
-                front: "📌 Posting a weekly announcement saying, \"Keep up the good work!\"",
+                front: "📌 Posting a weekly automated announcement or announcement saying, \"Keep up the good work!\"",
                 isRSI: false,
                 back: "❌ <strong>Not RSI</strong>",
                 reason: "<strong>Why?</strong> It's <strong>not related to course content</strong>.",
@@ -463,6 +481,14 @@
         
         // Event listeners
         flipBtn.addEventListener('click', toggleCard);
+        flashcard.addEventListener('click', function(e) {
+            // Don't flip if clicking on quiz buttons
+            if (e.target.id === 'yes-btn' || e.target.id === 'no-btn' || 
+                e.target.closest('.quiz-options')) {
+                return;
+            }
+            toggleCard();
+        });
         prevBtn.addEventListener('click', previousCard);
         nextBtn.addEventListener('click', nextCard);
         practiceBtn.addEventListener('click', enablePracticeMode);
@@ -473,7 +499,11 @@
         // Functions
         function toggleCard() {
             isFlipped = !isFlipped;
-            cardBack.classList.toggle('show');
+            if (isFlipped) {
+                cardBack.classList.add('show');
+            } else {
+                cardBack.classList.remove('show');
+            }
         }
         
         function previousCard() {
@@ -548,7 +578,7 @@
             
             if (isCorrect) {
                 correctAnswers++;
-                showConfetti(); // Trigger confetti on correct answer
+                createConfetti(20); // Create confetti for correct answers
             } else {
                 incorrectAnswers++;
             }
@@ -564,6 +594,29 @@
             noBtn.disabled = true;
             yesBtn.style.opacity = '0.5';
             noBtn.style.opacity = '0.5';
+        }
+        
+        // Function to create confetti
+        function createConfetti(count) {
+            const colors = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0'];
+            
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation completes
+                setTimeout(() => {
+                    confetti.remove();
+                }, 4000);
+            }
         }
         
         function updateScores() {
@@ -588,42 +641,6 @@
             incorrectAnswers = 0;
             quizAnswers = new Array(cardData.length).fill(undefined);
             updateScores();
-        }
-        
-        // New: Confetti effect for correct answers
-        function showConfetti() {
-            const numConfetti = 20;
-            const flashRect = flashcard.getBoundingClientRect();
-            
-            for (let i = 0; i < numConfetti; i++) {
-                const confetti = document.createElement('span');
-                // Display a random digit (0-9)
-                confetti.textContent = Math.floor(Math.random() * 10);
-                confetti.style.position = 'absolute';
-                // Random horizontal start within flashcard bounds
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.top = '0%';
-                confetti.style.opacity = '1';
-                // Random font size between 16px and 26px
-                confetti.style.fontSize = (16 + Math.random() * 10) + 'px';
-                // Ensure confetti appears above other elements
-                confetti.style.zIndex = 1000;
-                // Set transition for movement and fade out
-                confetti.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
-                
-                flashcard.appendChild(confetti);
-                
-                // Trigger animation on next frame
-                setTimeout(() => {
-                    confetti.style.transform = `translateY(${flashRect.height}px) rotate(${Math.random() * 360}deg)`;
-                    confetti.style.opacity = '0';
-                }, 10);
-                
-                // Remove confetti after animation completes
-                setTimeout(() => {
-                    flashcard.removeChild(confetti);
-                }, 1010);
-            }
         }
     </script>
 </body>
