@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSI Flashcards for Math Faculty</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #9b59b6;
+            --positive: #2ecc71;
+            --negative: #e74c3c;
+            --neutral: #34495e;
+            --light: #f5f7fa;
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            --button-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+        }
+        
+        .subheading {
+            font-size: 1.1rem;
+            color: var(--neutral);
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--neutral);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .card-container {
+            position: relative;
+            perspective: 1500px;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .card-front {
+            background: white;
+            color: var(--neutral);
+        }
+        
+        .card-back {
+            background: var(--neutral);
+            color: white;
+            transform: rotateY(180deg);
+            text-align: center;
+        }
+        
+        .card-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .rsi-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .positive {
+            background: var(--positive);
+            color: white;
+        }
+        
+        .negative {
+            background: var(--negative);
+            color: white;
+        }
+        
+        .card-content {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .card-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .card-explanation {
+            font-size: 1rem;
+            margin-top: 20px;
+            line-height: 1.4;
+        }
+        
+        .card-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .front-hint {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .control-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        
+        .flip-btn {
+            background: var(--secondary);
+        }
+        
+        .random-btn {
+            background: var(--neutral);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        
+        .card-counter {
+            font-size: 0.9rem;
+            color: var(--neutral);
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .score-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .score-item {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--button-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-label {
+            font-size: 0.9rem;
+            color: var(--neutral);
+            margin-bottom: 5px;
+        }
+        
+        .score-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .correct {
+            color: var(--positive);
+        }
+        
+        .incorrect {
+            color: var(--negative);
+        }
+        
+        .quiz-mode-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: var(--neutral);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--button-shadow);
+        }
+        
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--neutral);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--button-shadow);
+        }
+        
+        .dark-mode {
+            background: #2c3e50;
+        }
+        
+        .dark-mode h1 {
+            color: #3498db;
+        }
+        
+        .dark-mode .subheading,
+        .dark-mode .description,
+        .dark-mode .card-counter {
+            color: #ecf0f1;
+        }
+        
+        .dark-mode .card-front {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+        
+        .dark-mode .card-back {
+            background: #2c3e50;
+        }
+        
+        .dark-mode .front-hint {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .dark-mode .score-item {
+            background: #34495e;
+        }
+        
+        .dark-mode .score-label {
+            color: #ecf0f1;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .card-container {
+                height: 400px;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .control-btn {
+                width: 100%;
+            }
+            .score-container {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" id="dark-mode-toggle">🌙</button>
+    
+    <header>
+        <h1>RSI <span class="highlight">Flashcards</span> Game</h1>
+        <p class="subheading">Regular and Substantive Interaction for Math Faculty</p>
+        <p class="description">Test your knowledge of RSI requirements with these interactive flashcards! Click on a card to flip it or use the controls below.</p>
+    </header>
+    
+    <div class="container">
+        <div class="quiz-mode-container">
+            <button class="mode-btn active" id="practice-btn">Practice Mode</button>
+            <button class="mode-btn" id="quiz-btn">Quiz Mode</button>
+        </div>
+        
+        <div class="card-container">
+            <div class="card" id="card">
+                <div class="card-face card-front">
+                    <div class="card-label">SCENARIO</div>
+                    <div class="card-emoji">📌</div>
+                    <div class="card-content" id="card-front-content">Posting a weekly announcement saying, "Keep up the good work!"</div>
+                    <div class="card-hint front-hint">Click to reveal if this counts as RSI</div>
+                </div>
+                <div class="card-face card-back">
+                    <div class="rsi-status negative" id="rsi-status">❌ NOT RSI</div>
+                    <div class="card-content" id="card-back-content">
+                        <p><strong>Why?</strong> It's not related to course content.</p>
+                    </div>
+                    <div class="card-explanation" id="card-explanation">
+                        Instead, mention a tricky topic: ✅ <em>"Watch out for common mistakes in solving quadratic equations. Check out my tip video!"</em>
+                    </div>
+                    <div class="card-hint">Click to return to the front</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" id="prev-btn">⬅️ Previous</button>
+            <button class="control-btn flip-btn" id="flip-btn">↩️ Flip Card</button>
+            <button class="control-btn" id="next-btn">Next ➡️</button>
+            <button class="control-btn random-btn" id="random-btn">🔀 Random</button>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 12.5%;"></div>
+        </div>
+        <div class="card-counter" id="card-counter">Card 1 of 8</div>
+        
+        <div class="score-container" id="score-container" style="display: none;">
+            <div class="score-item">
+                <div class="score-label">Correct</div>
+                <div class="score-value correct" id="correct-score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Incorrect</div>
+                <div class="score-value incorrect" id="incorrect-score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Accuracy</div>
+                <div class="score-value" id="accuracy-score">0%</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Card data
+        const cardData = [
+            {
+                front: "📌 Posting a weekly announcement saying, \"Keep up the good work!\"",
+                isRSI: false,
+                back: "❌ <strong>Not RSI</strong>",
+                reason: "<strong>Why?</strong> It's <strong>not related to course content</strong>.",
+                explanation: "Instead, mention a tricky topic: ✅ <em>\"Watch out for common mistakes in solving quadratic equations. Check out my tip video!\"</em>"
+            },
+            {
+                front: "📌 Posting a video solving a common student mistake from Pearson assignments",
+                isRSI: true,
+                back: "✅ <strong>Counts as RSI</strong>",
+                reason: "<strong>Why?</strong> This is <strong>direct instruction</strong> and helps students learn!",
+                explanation: "Videos that address specific course content and common mistakes provide valuable instructional support."
+            },
+            {
+                front: "📌 Grading homework in Pearson/ALEKS without any feedback",
+                isRSI: false,
+                back: "❌ <strong>Not RSI</strong>",
+                reason: "<strong>Why?</strong> Automatic grading <strong>alone</strong> isn't enough.",
+                explanation: "✅ Instead, add a quick comment: <em>\"Check Example 3 in Pearson for a shortcut!\"</em>"
+            },
+            {
+                front: "📌 Replying to 3+ discussion posts with specific feedback on student work",
+                isRSI: true,
+                back: "✅ <strong>Counts as RSI</strong>",
+                reason: "<strong>Why?</strong> Engaging students in discussion <strong>about course content</strong> meets RSI rules.",
+                explanation: "✅ <em>\"Great explanation, Alex! But what if the coefficient was negative? How would that change your approach?\"</em>"
+            },
+            {
+                front: "📌 Holding a live office hour, but no students attend",
+                isRSI: true,
+                back: "✅ <strong>Still Counts as RSI!</strong>",
+                reason: "<strong>Why?</strong> <strong>Offering</strong> real-time interaction (even if no one comes) meets RSI.",
+                explanation: "✅ Just <strong>record it and post it</strong> for students to watch later!"
+            },
+            {
+                front: "📌 Only using ALEKS for all instruction, no instructor-student interaction",
+                isRSI: false,
+                back: "❌ <strong>Not RSI</strong>",
+                reason: "<strong>Why?</strong> RSI <strong>must be instructor-led</strong>, not just third-party software.",
+                explanation: "✅ Instead, post a <strong>weekly summary</strong>: <em>\"Most of you struggled with logarithms—watch my quick explainer video!\"</em>"
+            },
+            {
+                front: "📌 Using \"Message Students Who Scored Below 70%\" in the gradebook to send help",
+                isRSI: true,
+                back: "✅ <strong>Counts as RSI</strong>",
+                reason: "<strong>Why?</strong> <strong>Proactive instructor-initiated feedback</strong> keeps students engaged.",
+                explanation: "Reaching out to struggling students with specific guidance demonstrates regular and substantive interaction."
+            },
+            {
+                front: "📌 Posting a discussion prompt but never replying to students",
+                isRSI: false,
+                back: "❌ <strong>Not RSI</strong>",
+                reason: "<strong>Why?</strong> Instructors <strong>must actively participate</strong> in discussions!",
+                explanation: "✅ Add <strong>at least 3 responses</strong> each week to guide learning."
+            }
+        ];
+
+        // Variables for tracking state
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let quizMode = false;
+        let quizAnswers = [];
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        
+        // DOM elements
+        const card = document.getElementById('card');
+        const cardFrontContent = document.getElementById('card-front-content');
+        const cardBackContent = document.getElementById('card-back-content');
+        const cardExplanation = document.getElementById('card-explanation');
+        const rsiStatus = document.getElementById('rsi-status');
+        const progressBar = document.getElementById('progress-bar');
+        const cardCounter = document.getElementById('card-counter');
+        const scoreContainer = document.getElementById('score-container');
+        const correctScore = document.getElementById('correct-score');
+        const incorrectScore = document.getElementById('incorrect-score');
+        const accuracyScore = document.getElementById('accuracy-score');
+        
+        // Buttons
+        const flipBtn = document.getElementById('flip-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const practiceBtn = document.getElementById('practice-btn');
+        const quizBtn = document.getElementById('quiz-btn');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        
+        // Initialize
+        updateCard();
+        
+        // Event listeners
+        card.addEventListener('click', toggleFlip);
+        flipBtn.addEventListener('click', toggleFlip);
+        prevBtn.addEventListener('click', prevCard);
+        nextBtn.addEventListener('click', nextCard);
+        randomBtn.addEventListener('click', randomCard);
+        practiceBtn.addEventListener('click', enablePracticeMode);
+        quizBtn.addEventListener('click', enableQuizMode);
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        
+        // Functions
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            card.classList.toggle('flipped');
+            
+            if (quizMode && isFlipped) {
+                // In quiz mode, when flipping to see the answer, record the result
+                checkAnswer();
+            }
+        }
+        
+        function prevCard() {
+            isFlipped = false;
+            card.classList.remove('flipped');
+            currentCardIndex = (currentCardIndex - 1 + cardData.length) % cardData.length;
+            updateCard();
+        }
+        
+        function nextCard() {
+            isFlipped = false;
+            card.classList.remove('flipped');
+            currentCardIndex = (currentCardIndex + 1) % cardData.length;
+            updateCard();
+        }
+        
+        function randomCard() {
+            isFlipped = false;
+            card.classList.remove('flipped');
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * cardData.length);
+            } while (newIndex === currentCardIndex && cardData.length > 1);
+            currentCardIndex = newIndex;
+            updateCard();
+        }
+        
+        function updateCard() {
+            const currentCard = cardData[currentCardIndex];
+            
+            // Update front
+            cardFrontContent.innerHTML = currentCard.front;
+            
+            // Update back
+            rsiStatus.innerHTML = currentCard.back;
+            rsiStatus.className = 'rsi-status ' + (currentCard.isRSI ? 'positive' : 'negative');
+            cardBackContent.innerHTML = `<p>${currentCard.reason}</p>`;
+            cardExplanation.innerHTML = currentCard.explanation;
+            
+            // Update progress
+            progressBar.style.width = `${((currentCardIndex + 1) / cardData.length) * 100}%`;
+            cardCounter.textContent = `Card ${currentCardIndex + 1} of ${cardData.length}`;
+        }
+        
+        function enablePracticeMode() {
+            quizMode = false;
+            practiceBtn.classList.add('active');
+            quizBtn.classList.remove('active');
+            scoreContainer.style.display = 'none';
+            resetScores();
+        }
+        
+        function enableQuizMode() {
+            quizMode = true;
+            quizBtn.classList.add('active');
+            practiceBtn.classList.remove('active');
+            scoreContainer.style.display = 'flex';
+            resetScores();
+            
+            // Reset card position
+            isFlipped = false;
+            card.classList.remove('flipped');
+            currentCardIndex = 0;
+            updateCard();
+        }
+        
+        function checkAnswer() {
+            // Check if this card has already been answered in the current quiz session
+            if (quizAnswers[currentCardIndex] === undefined) {
+                // User's first answer for this card
+                let userThinks = confirm("Does this scenario count as RSI? Click OK for YES or Cancel for NO");
+                let isCorrect = (userThinks === cardData[currentCardIndex].isRSI);
+                
+                quizAnswers[currentCardIndex] = isCorrect;
+                
+                if (isCorrect) {
+                    correctAnswers++;
+                    createConfetti(20);
+                } else {
+                    incorrectAnswers++;
+                }
+                
+                updateScores();
+            }
+        }
+        
+        function updateScores() {
+            correctScore.textContent = correctAnswers;
+            incorrectScore.textContent = incorrectAnswers;
+            
+            let total = correctAnswers + incorrectAnswers;
+            let accuracy = total > 0 ? Math.round((correctAnswers / total) * 100) : 0;
+            accuracyScore.textContent = `${accuracy}%`;
+            
+            // Change color based on accuracy
+            if (accuracy >= 80) {
+                accuracyScore.style.color = 'var(--positive)';
+            } else if (accuracy >= 60) {
+                accuracyScore.style.color = 'orange';
+            } else {
+                accuracyScore.style.color = 'var(--negative)';
+            }
+        }
+        
+        function resetScores() {
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            quizAnswers = [];
+            updateScores();
+        }
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+        
+        // Confetti animation for correct answers
+        function createConfetti(num) {
+            const colors = ['#f44336', '#2196f3', '#ffeb3b', '#4caf50', '#9c27b0'];
+            
+            for (let i = 0; i < num; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation completes
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
