@@ -548,6 +548,7 @@
             
             if (isCorrect) {
                 correctAnswers++;
+                showConfetti(); // Trigger confetti on correct answer
             } else {
                 incorrectAnswers++;
             }
@@ -587,6 +588,42 @@
             incorrectAnswers = 0;
             quizAnswers = new Array(cardData.length).fill(undefined);
             updateScores();
+        }
+        
+        // New: Confetti effect for correct answers
+        function showConfetti() {
+            const numConfetti = 20;
+            const flashRect = flashcard.getBoundingClientRect();
+            
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('span');
+                // Display a random digit (0-9)
+                confetti.textContent = Math.floor(Math.random() * 10);
+                confetti.style.position = 'absolute';
+                // Random horizontal start within flashcard bounds
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '0%';
+                confetti.style.opacity = '1';
+                // Random font size between 16px and 26px
+                confetti.style.fontSize = (16 + Math.random() * 10) + 'px';
+                // Ensure confetti appears above other elements
+                confetti.style.zIndex = 1000;
+                // Set transition for movement and fade out
+                confetti.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+                
+                flashcard.appendChild(confetti);
+                
+                // Trigger animation on next frame
+                setTimeout(() => {
+                    confetti.style.transform = `translateY(${flashRect.height}px) rotate(${Math.random() * 360}deg)`;
+                    confetti.style.opacity = '0';
+                }, 10);
+                
+                // Remove confetti after animation completes
+                setTimeout(() => {
+                    flashcard.removeChild(confetti);
+                }, 1010);
+            }
         }
     </script>
 </body>
